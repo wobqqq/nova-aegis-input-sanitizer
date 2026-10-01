@@ -4,6 +4,8 @@ All notable changes are documented here. The format follows [Keep a Changelog](h
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-01
+
 ### Added
 
 - The Input Sanitizer section of the Aegis settings, off until enabled: block threshold, the page shown to a blocked request, JSON and Nova scanning (both off), logging, one pattern per kind of payload and the excluded inputs and headers.
@@ -14,3 +16,7 @@ All notable changes are documented here. The format follows [Keep a Changelog](h
 - Blocked requests are logged without values.
 - A dashboard status line and a check for skipped patterns and missing pages.
 - `aegis:input-sanitizer:disable` console command.
+- Requires Aegis 1.1 or later.
+
+[Unreleased]: https://github.com/wobqqq/nova-aegis-input-sanitizer/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/wobqqq/nova-aegis-input-sanitizer/releases/tag/v1.0.0
