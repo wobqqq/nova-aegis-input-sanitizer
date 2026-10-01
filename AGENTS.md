@@ -4,7 +4,7 @@ Guidance for coding agents working in this repository.
 
 ## What this is
 
-**Aegis Input Sanitizer** (`wobqqq/nova-aegis-input-sanitizer`) is an add-on module of [Aegis](https://github.com/wobqqq/nova-aegis), the security suite for Laravel Nova (Laravel 12 or 13, PHP 8.2+). It scores every request — the query string, the form body, JSON bodies when enabled, the keys of all of them, the headers and the URL segments, each decoded up to three times — against the administrator's regular expressions for XSS, encoded XSS, command injection, path traversal, template injection, null bytes and CSV injection, and answers 400 with the configured page (or JSON) once the score reaches the threshold.
+**Aegis Input Sanitizer** (`wobqqq/nova-aegis-input-sanitizer`) is an add-on module of [Aegis](https://github.com/wobqqq/nova-aegis), the security suite for Laravel Nova (Laravel 12 or 13, PHP 8.4+). It scores every request — the query string, the form body, JSON bodies when enabled, the keys of all of them, the headers and the URL segments, each decoded up to three times — against the administrator's regular expressions for XSS, encoded XSS, command injection, path traversal, template injection, null bytes and CSV injection, and answers 400 with the configured page (or JSON) once the score reaches the threshold.
 
 It is the Laravel/Nova port of the October CMS Fortify module `oc-fortify-input-sanitizer-plugin`, with the fixes of its 1.0.3 release (patterns that do not compile or give up, settings applied as soon as they are saved, safe fallbacks for broken settings).
 
