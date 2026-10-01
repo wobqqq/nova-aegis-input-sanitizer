@@ -23,7 +23,7 @@
 ## 📦 Requirements
 
 - PHP 8.2 or higher
-- Laravel 12
+- Laravel 12 or 13
 - Laravel Nova 5
 - [Aegis](https://github.com/wobqqq/nova-aegis) 1.1 or later (installed with the module)
 
