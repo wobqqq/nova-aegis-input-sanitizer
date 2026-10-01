@@ -9,10 +9,14 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Http\Kernel as HttpKernel;
+use Illuminate\Foundation\Http\Kernel;
 use Illuminate\Support\ServiceProvider;
 use Wobqqq\Aegis\Aegis;
 use Wobqqq\Aegis\Events\SettingsSaved;
 use Wobqqq\AegisInputSanitizer\Checks\PatternsCheck;
+use Wobqqq\AegisInputSanitizer\Console\DisableCommand;
+use Wobqqq\AegisInputSanitizer\Http\Middleware\SanitizeInput;
 use Wobqqq\AegisInputSanitizer\Settings\SettingsStore;
 
 final class InputSanitizerServiceProvider extends ServiceProvider
@@ -35,6 +39,7 @@ final class InputSanitizerServiceProvider extends ServiceProvider
     public function boot(Dispatcher $events): void
     {
         $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'aegis-input-sanitizer');
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'aegis-input-sanitizer');
 
         Aegis::module(new InputSanitizerModule());
         Aegis::check($this->app->make(PatternsCheck::class));
@@ -49,6 +54,17 @@ final class InputSanitizerServiceProvider extends ServiceProvider
                 $this->app->make(SettingsStore::class)->forget();
             }
         });
+
+        $kernel = $this->app->make(HttpKernel::class);
+
+        if ($kernel instanceof Kernel) {
+            $kernel->pushMiddleware(SanitizeInput::class);
+        }
+
+        if ($this->app->runningInConsole()) {
+            $this->publishes([__DIR__ . '/../resources/views' => resource_path('views/vendor/aegis-input-sanitizer')], 'aegis-input-sanitizer-views');
+            $this->commands([DisableCommand::class]);
+        }
     }
 
     private static function cache(Application $app): Cache
