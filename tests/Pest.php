@@ -30,6 +30,6 @@ function sanitize(array $values = []): array
 {
     return Aegis::save(
         InputSanitizerModule::KEY,
-        array_replace((new InputSanitizerModule())->defaults(), ['enabled' => true], $values),
+        array_replace(new InputSanitizerModule()->defaults(), ['enabled' => true], $values),
     );
 }

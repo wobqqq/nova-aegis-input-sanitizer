@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Wobqqq\AegisInputSanitizer;
 
+use Override;
 use Wobqqq\Aegis\Checks\CheckResult;
 use Wobqqq\Aegis\Contracts\Module;
 use Wobqqq\Aegis\Settings\Field;
@@ -11,26 +12,31 @@ use Wobqqq\AegisInputSanitizer\Enums\Category;
 use Wobqqq\AegisInputSanitizer\Rules\CompilablePattern;
 use Wobqqq\AegisInputSanitizer\Rules\ExistingView;
 use Wobqqq\AegisInputSanitizer\Settings\InputSanitizerSettings;
+use Wobqqq\AegisInputSanitizer\Support\Message;
 
 final class InputSanitizerModule implements Module
 {
-    public const KEY = 'input-sanitizer';
+    public const string KEY = 'input-sanitizer';
 
+    #[Override]
     public function key(): string
     {
         return self::KEY;
     }
 
+    #[Override]
     public function label(): string
     {
         return $this->trans('label');
     }
 
+    #[Override]
     public function description(): string
     {
         return $this->trans('description');
     }
 
+    #[Override]
     public function defaults(): array
     {
         $defaults = [
@@ -49,6 +55,7 @@ final class InputSanitizerModule implements Module
         return $defaults + ['excluded_inputs' => [], 'excluded_headers' => []];
     }
 
+    #[Override]
     public function rules(): array
     {
         $rules = [
@@ -71,6 +78,10 @@ final class InputSanitizerModule implements Module
         return $rules;
     }
 
+    /**
+     * @return list<Field>
+     */
+    #[Override]
     public function fields(): array
     {
         $fields = [
@@ -92,6 +103,7 @@ final class InputSanitizerModule implements Module
         return $fields;
     }
 
+    #[Override]
     public function status(array $values): CheckResult
     {
         $settings = InputSanitizerSettings::fromArray($values);
@@ -116,6 +128,6 @@ final class InputSanitizerModule implements Module
      */
     private function trans(string $key, array $replace = []): string
     {
-        return (string)__('aegis-input-sanitizer::input-sanitizer.' . $key, $replace);
+        return Message::get('aegis-input-sanitizer::input-sanitizer.' . $key, $replace);
     }
 }

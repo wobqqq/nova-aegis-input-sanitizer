@@ -4,6 +4,16 @@ All notable changes are documented here. The format follows [Keep a Changelog](h
 
 ## [Unreleased]
 
+### Added
+
+- Laravel 13 support; CI runs the suite on Laravel 12 and 13.
+- Works with Aegis 2 as well as Aegis 1.1 or later.
+
+### Changed
+
+- PHP 8.4 or later is required.
+- Native types throughout: typed constants and properties, `#[\Override]` on every overriding method, readonly value objects; no behaviour change.
+
 ## [1.0.1] - 2026-10-01
 
 ### Changed

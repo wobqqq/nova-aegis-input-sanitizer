@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
+use Mockery\MockInterface;
 use Wobqqq\Aegis\Aegis;
 use Wobqqq\Aegis\Checks\CheckRunner;
 use Wobqqq\Aegis\Enums\Status;
@@ -40,7 +41,7 @@ it('adds its section to the Aegis settings, off and with a pattern for every kin
     expect($values)->toMatchArray(['enabled' => false, 'scan_json' => false, 'scan_nova' => false, 'block_threshold' => 1]);
 
     foreach (Category::cases() as $category) {
-        expect($values[$category->setting()])->toBe($category->defaultPattern());
+        expect($values[$category->setting()] ?? null)->toBe($category->defaultPattern());
     }
 
     expect(store()->settings()->enabled)->toBeFalse()
@@ -102,7 +103,7 @@ it('accepts valid excluded names and an existing view', function (): void {
         'excluded_inputs' => [['name' => 'content.body'], ['name' => '_token']],
     ]);
 
-    expect($saved['view'])->toBe('custom-blocked')
+    expect($saved['view'] ?? null)->toBe('custom-blocked')
         ->and(store()->settings()->excludedInputs)->toBe(['content.body' => true, '_token' => true])
         ->and(store()->settings()->excludedHeaders)->toBe(['cookie' => true, 'accept' => true, 'x-template' => true]);
 });
@@ -122,7 +123,7 @@ it('applies a row saved without the core event, and a deleted row', function ():
     sanitize(['block_threshold' => 2]);
     expect(store()->settings()->blockThreshold)->toBe(2);
 
-    storeRaw(array_replace((new InputSanitizerModule())->defaults(), ['enabled' => true, 'block_threshold' => 9]));
+    storeRaw(array_replace(new InputSanitizerModule()->defaults(), ['enabled' => true, 'block_threshold' => 9]));
     expect(store()->settings()->blockThreshold)->toBe(9);
 
     AegisSetting::query()->where('section', InputSanitizerModule::KEY)->firstOrFail()->delete();
@@ -162,7 +163,7 @@ it('falls back to safe values for a broken stored row', function (): void {
 });
 
 it('gives blocked requests the built-in page when the saved one is gone', function (): void {
-    storeRaw(array_replace((new InputSanitizerModule())->defaults(), ['enabled' => true, 'view' => 'deleted-view']));
+    storeRaw(array_replace(new InputSanitizerModule()->defaults(), ['enabled' => true, 'view' => 'deleted-view']));
 
     expect(store()->settings()->view)->toBe(InputSanitizerSettings::DEFAULT_VIEW);
 });
@@ -185,7 +186,7 @@ it('rebuilds a cached entry another version wrote in another shape', function ()
 it('reads the section directly when the cache is down', function (): void {
     sanitize(['block_threshold' => 6]);
 
-    /** @var CacheRepository&Mockery\MockInterface $cache */
+    /** @var CacheRepository&MockInterface $cache */
     $cache = Mockery::mock(CacheRepository::class);
     $cache->allows('remember')->andThrow(new RuntimeException('cache down'));
     $cache->allows('forget')->andThrow(new RuntimeException('cache down'));
@@ -198,7 +199,7 @@ it('reads the section directly when the cache is down', function (): void {
 });
 
 it('saves through the Aegis page and refuses a broken pattern there', function (): void {
-    $values = array_replace((new InputSanitizerModule())->defaults(), ['enabled' => true, 'block_threshold' => 3]);
+    $values = array_replace(new InputSanitizerModule()->defaults(), ['enabled' => true, 'block_threshold' => 3]);
 
     actingAs(admin())->putJson('/nova-vendor/aegis/settings/input-sanitizer', ['values' => $values])->assertOk();
     expect(store()->settings()->blockThreshold)->toBe(3);
@@ -229,9 +230,9 @@ it('warns about a saved pattern it skips and a page that is gone', function (): 
     sanitize();
     expect($check()?->status)->toBe(Status::PASS);
 
-    storeRaw(array_replace((new InputSanitizerModule())->defaults(), ['enabled' => true, 'xss_patterns' => '~(~', 'null_byte_patterns' => '~[~']));
+    storeRaw(array_replace(new InputSanitizerModule()->defaults(), ['enabled' => true, 'xss_patterns' => '~(~', 'null_byte_patterns' => '~[~']));
     expect($check()?->status)->toBe(Status::WARN)->and($check()?->message)->toContain('XSS patterns, Null byte patterns');
 
-    storeRaw(array_replace((new InputSanitizerModule())->defaults(), ['enabled' => true, 'view' => 'deleted-view']));
+    storeRaw(array_replace(new InputSanitizerModule()->defaults(), ['enabled' => true, 'view' => 'deleted-view']));
     expect($check()?->status)->toBe(Status::WARN)->and($check()?->message)->toContain('deleted-view');
 });

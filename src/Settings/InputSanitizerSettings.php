@@ -10,20 +10,20 @@ use Wobqqq\AegisInputSanitizer\Scanning\PatternMatcher;
 
 final readonly class InputSanitizerSettings
 {
-    public const DEFAULT_VIEW = 'aegis-input-sanitizer::blocked';
+    public const string DEFAULT_VIEW = 'aegis-input-sanitizer::blocked';
 
-    public const DEFAULT_THRESHOLD = 1;
+    public const int DEFAULT_THRESHOLD = 1;
 
-    public const MAX_THRESHOLD = 1000;
+    public const int MAX_THRESHOLD = 1000;
 
-    public const VIEW_NAME = '/^(?:[A-Za-z0-9_-]+::)?[A-Za-z0-9_-]+(?:[.\/][A-Za-z0-9_-]+)*$/';
+    public const string VIEW_NAME = '/^(?:[A-Za-z0-9_-]+::)?[A-Za-z0-9_-]+(?:[.\/][A-Za-z0-9_-]+)*$/';
 
-    public const INPUT_NAME = '/^[A-Za-z0-9_][A-Za-z0-9_.-]*$/';
+    public const string INPUT_NAME = '/^[A-Za-z0-9_][A-Za-z0-9_.-]*$/';
 
-    public const HEADER_NAME = '/^[A-Za-z0-9-]+$/';
+    public const string HEADER_NAME = '/^[A-Za-z0-9-]+$/';
 
     /** Their values are never typed by a visitor and hold characters the patterns flag. */
-    public const ALWAYS_EXCLUDED_HEADERS = ['cookie', 'accept'];
+    public const array ALWAYS_EXCLUDED_HEADERS = ['cookie', 'accept'];
 
     /**
      * @param array<string, string> $patterns category value => pattern, only the patterns that compile

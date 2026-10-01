@@ -17,11 +17,12 @@ use Wobqqq\AegisInputSanitizer\Scanning\RequestScanner;
 use Wobqqq\AegisInputSanitizer\Scanning\ScanResult;
 use Wobqqq\AegisInputSanitizer\Settings\InputSanitizerSettings;
 use Wobqqq\AegisInputSanitizer\Settings\SettingsStore;
+use Wobqqq\AegisInputSanitizer\Support\Message;
 
 final readonly class SanitizeInput
 {
     /** The Aegis settings carry the patterns themselves: never scanned, or a pattern could not be fixed. */
-    private const AEGIS_API = 'nova-vendor/aegis';
+    private const string AEGIS_API = 'nova-vendor/aegis';
 
     public function __construct(
         private SettingsStore $store,
@@ -39,8 +40,8 @@ final readonly class SanitizeInput
         try {
             $settings = $this->store->settings();
             $result = $settings->enabled && $this->scans($request, $settings) ? $this->scanner->scan($request, $settings) : null;
-        } catch (Throwable $e) {
-            report($e);
+        } catch (Throwable $throwable) {
+            report($throwable);
 
             return $next($request);
         }
@@ -98,14 +99,14 @@ final readonly class SanitizeInput
 
     private function refuse(Request $request, InputSanitizerSettings $settings): Response
     {
-        $message = (string)__('aegis-input-sanitizer::input-sanitizer.blocked.message');
+        $message = Message::get('aegis-input-sanitizer::input-sanitizer.blocked.message');
         $headers = ['Cache-Control' => 'no-store', 'X-Content-Type-Options' => 'nosniff'];
 
         if ($request->expectsJson()) {
             return new JsonResponse(['message' => $message], Response::HTTP_BAD_REQUEST, $headers);
         }
 
-        /** @var list<view-string> $views */
+        /** @var non-empty-list<view-string> $views */
         $views = array_values(array_unique([$settings->view, InputSanitizerSettings::DEFAULT_VIEW]));
 
         foreach ($views as $view) {

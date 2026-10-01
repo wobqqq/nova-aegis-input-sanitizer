@@ -12,6 +12,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Illuminate\Foundation\Http\Kernel;
 use Illuminate\Support\ServiceProvider;
+use Override;
 use Wobqqq\Aegis\Aegis;
 use Wobqqq\Aegis\Events\SettingsSaved;
 use Wobqqq\AegisInputSanitizer\Checks\PatternsCheck;
@@ -22,11 +23,12 @@ use Wobqqq\AegisInputSanitizer\Settings\SettingsStore;
 final class InputSanitizerServiceProvider extends ServiceProvider
 {
     /** A row written without Aegis::save() dispatches no SettingsSaved; listened to by name, so a renamed model only silences it. */
-    private const SETTING_MODEL_EVENTS = [
+    private const array SETTING_MODEL_EVENTS = [
         'eloquent.saved: Wobqqq\Aegis\Settings\AegisSetting',
         'eloquent.deleted: Wobqqq\Aegis\Settings\AegisSetting',
     ];
 
+    #[Override]
     public function register(): void
     {
         // Scoped, not a singleton: a long-running worker reads the settings again on every request.

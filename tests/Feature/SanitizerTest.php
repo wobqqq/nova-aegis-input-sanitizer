@@ -5,7 +5,9 @@ declare(strict_types=1);
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Support\Facades\Event;
+use Mockery\MockInterface;
 use Wobqqq\Aegis\Settings\AegisSetting;
+use Wobqqq\Aegis\Settings\SettingsRepository;
 use Wobqqq\AegisInputSanitizer\Enums\Category;
 use Wobqqq\AegisInputSanitizer\InputSanitizerModule;
 use Wobqqq\AegisInputSanitizer\Scanning\PatternMatcher;
@@ -97,8 +99,10 @@ it('skips the excluded inputs and headers, and never scans cookies or Accept', f
     post('/page', ['content' => '<script>editor()</script>'])->assertOk();
     postJson('/api/comments', ['post' => ['body' => '<b onclick=x()>', 'title' => 'Hello']])->assertOk();
     postJson('/api/comments', ['post' => ['body' => 'ok', 'title' => '<script>']])->assertBadRequest();
+
     get('/page', ['X-Template' => '{{ name }}'])->assertOk();
     get('/page', ['Accept' => '*/*; =x'])->assertOk();
+
     call('GET', '/page', [], ['a' => '{{b}}'])->assertOk();
     post('/page', ['title' => '<script>x</script>'])->assertBadRequest();
 });
@@ -124,7 +128,7 @@ it('never scans Nova unless asked to, and never the Aegis settings', function ()
     post('/admin/resources/posts', ['body' => '<script>x</script>'])->assertBadRequest();
     post('/nova-api/posts?q=' . urlencode('<script>'))->assertBadRequest();
 
-    $values = array_replace((new InputSanitizerModule())->defaults(), ['enabled' => false, 'scan_nova' => true]);
+    $values = array_replace(new InputSanitizerModule()->defaults(), ['enabled' => false, 'scan_nova' => true]);
 
     actingAs(admin())->putJson('/nova-vendor/aegis/settings/input-sanitizer', ['values' => $values])
         ->assertOk()
@@ -153,7 +157,7 @@ it('answers plain text when no page can be rendered', function (): void {
     sanitize();
     resolve(SettingsStore::class)->settings();
 
-    /** @var Mockery\MockInterface&ViewFactory $views */
+    /** @var MockInterface&ViewFactory $views */
     $views = Mockery::mock(ViewFactory::class);
     $views->allows('exists')->andReturnTrue();
     $views->allows('make')->andThrow(new RuntimeException('views down'));
@@ -169,10 +173,10 @@ it('answers plain text when no page can be rendered', function (): void {
 it('keeps the site working with a saved pattern that does not compile', function (): void {
     sanitize();
     AegisSetting::query()->where('section', InputSanitizerModule::KEY)->update(['values' => json_encode(array_replace(
-        (new InputSanitizerModule())->defaults(),
+        new InputSanitizerModule()->defaults(),
         ['enabled' => true, 'xss_patterns' => '~(unclosed~', 'ssti_patterns' => '~\{\{.*?\}\}~'],
     ), JSON_THROW_ON_ERROR)]);
-    resolve(Wobqqq\Aegis\Settings\SettingsRepository::class)->flush();
+    resolve(SettingsRepository::class)->flush();
     resolve(SettingsStore::class)->forget();
 
     get('/page?q=' . urlencode('text <script>'))->assertOk();
@@ -206,7 +210,7 @@ it('lets every request through when no pattern is in use', function (): void {
 it('lets the request through when the sanitizer itself breaks', function (): void {
     sanitize();
 
-    /** @var Mockery\MockInterface&ViewFactory $views */
+    /** @var MockInterface&ViewFactory $views */
     $views = Mockery::mock(ViewFactory::class);
     $views->allows('exists')->andThrow(new RuntimeException('views down'));
     app()->instance('view', $views);
@@ -227,10 +231,14 @@ it('logs where the payload was, never its value', function (): void {
 
     expect($logged)->toHaveCount(1);
 
-    $encoded = json_encode($logged[0]->context, JSON_THROW_ON_ERROR);
+    [$entry] = $logged + [null];
+    expect($entry)->toBeInstanceOf(MessageLogged::class);
+    assert($entry instanceof MessageLogged);
 
-    expect($logged[0]->level)->toBe('warning')
-        ->and($logged[0]->context['matches'])->toBe(['query.password (xss)', 'header.x-search (ssti)'])
+    $encoded = json_encode($entry->context, JSON_THROW_ON_ERROR);
+
+    expect($entry->level)->toBe('warning')
+        ->and($entry->context['matches'] ?? null)->toBe(['query.password (xss)', 'header.x-search (ssti)'])
         ->and($encoded)->not->toContain('hunter2')
         ->and($encoded)->not->toContain('secret-token');
 

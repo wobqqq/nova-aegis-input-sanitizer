@@ -23,10 +23,10 @@ return [
         'block_threshold' => 'Every pattern that matches a value adds one; the request is refused once the whole request reaches this score.',
         'view' => 'A Blade view name; the built-in page is used when it does not exist.',
         'scan_json' => 'Off: JSON bodies pass unscanned (their query string, headers and URL are still scanned). Turn it on once your APIs send no HTML.',
-        'scan_nova' => 'Nova\'s rich-text fields send HTML on purpose. The Aegis settings themselves are never scanned.',
+        'scan_nova' => "Nova's rich-text fields send HTML on purpose. The Aegis settings themselves are never scanned.",
         'log_blocked' => 'Writes the IP, the method and where the payload was, never the value.',
         'patterns' => 'One PCRE pattern with its delimiters. A pattern that does not compile is refused; one that gives up on a long input is no match.',
-        'excluded_inputs' => 'Input names or dotted paths (content, post.body), case-insensitive: a rich-text editor\'s field goes here.',
+        'excluded_inputs' => "Input names or dotted paths (content, post.body), case-insensitive: a rich-text editor's field goes here.",
         'excluded_headers' => 'Cookie and Accept are never scanned.',
     ],
 

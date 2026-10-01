@@ -1,0 +1,5 @@
+providers:
+  - Inertia\ServiceProvider
+  - Laravel\Nova\NovaCoreServiceProvider
+  - Wobqqq\Aegis\AegisServiceProvider
+  - Wobqqq\AegisInputSanitizer\InputSanitizerServiceProvider
