@@ -12,7 +12,7 @@ metadata:
 
 # Nova and the Aegis page (this package)
 
-The module has no Nova tool, card, route or Vue code of its own: the Aegis core draws its section from `InputSanitizerModule::fields()` and saves it through its own API (`PUT /nova-vendor/aegis/settings/input-sanitizer`, behind `nova`, `nova.auth` and `viewAegis`). Check Nova's and the core's source in `vendor/` before relying on an API.
+The module has no Nova tool, card, route or Vue code of its own: the Aegis core draws its section from `InputSanitizerModule::fields()` and saves it through its own API (`PUT /nova-vendor/aegis/settings/input-sanitizer`, behind `nova`, `nova.auth` and `viewAegis`). Check the core's source in `vendor/` before relying on an API. `vendor/laravel/nova` here is the test double in `stubs/nova`, not Nova: check a version-specific API in a real Nova install, and add any Nova class or method you start using to the core's `stubs/nova` with its real signature, then copy it here (see `package-testing`).
 
 ## The pieces
 

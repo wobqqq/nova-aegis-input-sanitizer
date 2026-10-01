@@ -15,17 +15,18 @@ This is a **security product installed on production applications**. A bug here 
 Everything runs in Docker; the host needs no PHP. The container mounts the parent directory, so the core's checkout must sit next to this one (`../nova-aegis`).
 
 ```bash
-make install        # composer install (the core from ../nova-aegis, Nova from nova.laravel.com)
+make install        # composer install (the core from ../nova-aegis, Nova from the stubs/nova test double)
 make code.fix       # composer normalize, Rector, PHP CS Fixer
 make code.check     # validate, normalize --dry-run, composer audit, php -l, cs, Rector, PHPStan max
 make test           # Pest
 make test.coverage  # Pest with pcov, failing below 90 %
 make ready          # all of the above
+make test.nova      # optional: Pest on the real laravel/nova (needs a license)
 ```
 
 `make ready` must pass. PHPStan runs at `level: max` with strict rules and **no baseline**: fix the type, never add an ignore. Advisories from `composer audit` are fixed by updating the package, never ignored.
 
-Installing Nova needs a license: `auth.json` (gitignored and export-ignored) holds the credentials. Never read, print or commit it.
+No Nova license is needed: `laravel/nova` resolves to the test double in `stubs/nova` (see *Tests*). `make test.nova` runs the suite on the real Nova and is the only command that needs a license, read from `auth.json` (gitignored and export-ignored). Never read, print or commit it.
 
 ## How the code is laid out
 
@@ -44,6 +45,7 @@ Installing Nova needs a license: `auth.json` (gitignored and export-ignored) hol
 | `src/Console/DisableCommand.php` | `aegis:input-sanitizer:disable`, the recovery path. |
 | `resources/views/blocked.blade.php` | The built-in page for a blocked request. |
 | `resources/lang/en/input-sanitizer.php` | Every label and message, under `aegis-input-sanitizer::input-sanitizer.*`. |
+| `stubs/nova/` | The Nova test double the suite and PHPStan run on, a copy of the core's (export-ignored). |
 
 ### Working with the core
 
@@ -87,7 +89,9 @@ The Aegis page in Nova stays reachable while the module is on: Nova and the Aegi
 
 ## Tests
 
-Pest 4 on Orchestra Testbench 10 with the real `laravel/nova` and the real Aegis core (SQLite in memory). No test reaches the network. Read the `package-testing` skill.
+Pest 4 on Orchestra Testbench 10 with the real Aegis core (SQLite in memory). No test reaches the network. Read the `package-testing` skill.
+
+`laravel/nova` is the test double in `stubs/nova`: a path repository (`"versions": {"laravel/nova": "5.99.0"}`, symlinked) declared in `composer.json`, so `make install`, CI and PHPStan need no license; the `require` stays `laravel/nova: ^5.0`, and applications get the real Nova because a dependency's repositories are ignored. The double is our own minimal code, never Nova's, and an exact copy of the core's `stubs/nova`: never edit it here. When the module starts using a Nova API the double lacks, add it to the core's `stubs/nova` first (a pull request on the core, with the real signature), then copy the directory here unchanged; check it with `make test.nova` when you have a license.
 
 ## Git workflow
 
@@ -96,7 +100,7 @@ Pest 4 on Orchestra Testbench 10 with the real `laravel/nova` and the real Aegis
   2. commit on the branch and `git push -u origin <branch>`;
   3. open a pull request with the template filled in (what changes, what it means for applications that upgrade);
   4. merge once `make ready` passed, then delete the branch.
-- GitHub Actions run `composer code.check` and `composer test.coverage` on every pull request, with the core checked out next to the module (`nova-aegis`, branch `main`) for the path repository. They need the `NOVA_USERNAME` and `NOVA_LICENSE_KEY` secrets, and `AEGIS_CORE_TOKEN` (read access to `wobqqq/nova-aegis`) while the core is private.
+- GitHub Actions run `composer code.check` and `composer test.coverage` on every pull request, with the core checked out next to the module (`nova-aegis`, branch `main`) for the path repository. They need no Nova license (Nova is the `stubs/nova` test double), only `AEGIS_CORE_TOKEN` (read access to `wobqqq/nova-aegis`) while the core is private.
 - A release is a tag pushed on a merged commit of `main` (`git tag -a v1.0.0 -m "..." && git push origin v1.0.0`) with its section in `CHANGELOG.md`; the release workflow runs CI and publishes the GitHub release, Packagist reads the tag.
 - Code, comments, commit messages, pull requests, issues and documentation are written in **English**.
 
