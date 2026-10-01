@@ -1,24 +1,15 @@
-# One pull request a week, lock file only: the version ranges in composer.json
-# move on purpose, never by a bot. Nova comes from nova.laravel.com, read with the
-# Dependabot secrets NOVA_USERNAME / NOVA_LICENSE_KEY.
+# Composer is left out: the core resolves from the ../nova-aegis checkout, which
+# Dependabot cannot see. The weekly audit workflow and CI against the latest core
+# cover the PHP dependencies instead.
 version: 2
 
-registries:
-  nova:
-    type: composer-repository
-    url: https://nova.laravel.com
-    username: ${{secrets.NOVA_USERNAME}}
-    password: ${{secrets.NOVA_LICENSE_KEY}}
-
 updates:
-  - package-ecosystem: composer
+  - package-ecosystem: github-actions
     directory: /
-    registries: [nova]
     schedule:
       interval: weekly
       day: monday
-    versioning-strategy: lockfile-only
     open-pull-requests-limit: 3
     groups:
-      composer:
+      github-actions:
         patterns: ['*']
