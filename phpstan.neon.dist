@@ -1,0 +1,15 @@
+parameters:
+    level: max
+    phpVersion:
+        min: 80200
+        max: 80499
+    paths:
+        - src
+        - resources/lang
+        - tests
+    excludePaths:
+        # Pest's arch() DSL is declarative configuration that PHPStan cannot type.
+        - tests/Unit/ArchitectureTest.php
+    strictRules:
+        dynamicCallOnStaticMethod: false
+    treatPhpDocTypesAsCertain: false

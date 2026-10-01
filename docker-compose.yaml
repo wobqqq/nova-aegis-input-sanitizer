@@ -1,0 +1,13 @@
+services:
+    php:
+        build: docker/php
+        image: wobqqq/oc-php:8.4
+        user: '${UID:-1000}:${GID:-1000}'
+        # The parent directory is mounted so the path repository ../nova-aegis resolves.
+        working_dir: /work/nova-aegis-input-sanitizer
+        volumes:
+            - ..:/work
+            - composer-cache:/tmp/composer
+
+volumes:
+    composer-cache:
