@@ -45,6 +45,9 @@
             "Read(**/auth.json)",
             "Read(**/*.pem)",
             "Read(**/*.key)",
+            "Bash(git push origin main)",
+            "Bash(git push origin main:*)",
+            "Bash(git push origin HEAD:main:*)",
             "Bash(git push -f:*)",
             "Bash(git push --force-with-lease:*)"
         ]
