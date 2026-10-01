@@ -1,18 +1,21 @@
 <?php
 
 declare(strict_types=1);
+use PhpCsFixer\Config;
+use PhpCsFixer\Finder;
 
-$finder = PhpCsFixer\Finder::create()
-    ->in([__DIR__ . '/src', __DIR__ . '/tests', __DIR__ . '/resources/lang', __DIR__ . '/stubs'])
+$finder = Finder::create()
+    ->in([__DIR__ . '/src', __DIR__ . '/tests', __DIR__ . '/resources/lang'])
     ->append([__DIR__ . '/rector.php', __DIR__ . '/.php-cs-fixer.dist.php']);
 
-return (new PhpCsFixer\Config())
+return new Config()
     ->setFinder($finder)
     ->setRiskyAllowed(true)
     ->setCacheFile(__DIR__ . '/.php-cs-fixer.cache')
     ->setRules([
         '@PSR12' => true,
-        '@PHP8x2Migration' => true,
+        '@PHP8x4Migration' => true,
+        '@PHP8x4Migration:risky' => true,
         'array_syntax' => ['syntax' => 'short'],
         'binary_operator_spaces' => true,
         'blank_line_after_opening_tag' => true,
@@ -23,7 +26,7 @@ return (new PhpCsFixer\Config())
         'combine_consecutive_unsets' => true,
         'concat_space' => ['spacing' => 'one'],
         'declare_strict_types' => true,
-        'fully_qualified_strict_types' => true,
+        'fully_qualified_strict_types' => ['import_symbols' => true],
         'global_namespace_import' => ['import_classes' => true, 'import_constants' => false, 'import_functions' => false],
         'lowercase_cast' => true,
         'method_argument_space' => true,
@@ -36,7 +39,7 @@ return (new PhpCsFixer\Config())
         'no_extra_blank_lines' => true,
         'no_leading_import_slash' => true,
         'no_superfluous_elseif' => true,
-        'no_superfluous_phpdoc_tags' => ['allow_mixed' => true, 'remove_inheritdoc' => true],
+        'no_superfluous_phpdoc_tags' => ['allow_mixed' => false, 'allow_unused_params' => false, 'remove_inheritdoc' => true],
         'no_unused_imports' => true,
         'no_useless_else' => true,
         'no_useless_return' => true,
@@ -61,4 +64,12 @@ return (new PhpCsFixer\Config())
         'types_spaces' => true,
         'unary_operator_spaces' => true,
         'whitespace_after_comma_in_array' => true,
+        'final_class' => true,
+        'nullable_type_declaration_for_default_null_value' => true,
+        'self_accessor' => true,
+        'strict_comparison' => true,
+        'strict_param' => true,
+        'void_return' => true,
+        'phpdoc_to_return_type' => true,
+        'use_arrow_functions' => true,
     ]);

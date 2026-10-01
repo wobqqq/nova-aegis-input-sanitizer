@@ -44,7 +44,8 @@
         "phpstan/phpstan": "^2.1",
         "phpstan/phpstan-deprecation-rules": "^2.0",
         "phpstan/phpstan-strict-rules": "^2.0",
-        "rector/rector": "^2.2"
+        "rector/rector": "^2.2",
+        "shipmonk/phpstan-rules": "^4.4"
     },
     "repositories": {
         "aegis": {
