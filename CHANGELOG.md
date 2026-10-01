@@ -7,6 +7,7 @@ All notable changes are documented here. The format follows [Keep a Changelog](h
 ### Added
 
 - Laravel 13 support; CI runs the suite on Laravel 12 and 13.
+- Works with Aegis 2 as well as Aegis 1.1 or later.
 
 ### Changed
 

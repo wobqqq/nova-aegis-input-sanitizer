@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "75873695adc8bc10fe039304481bec32",
+    "content-hash": "7a747bec201835ffba49ce31a03bc108",
     "packages": [
         {
             "name": "brick/math",
@@ -5950,7 +5950,7 @@
             "dist": {
                 "type": "path",
                 "url": "../nova-aegis",
-                "reference": "1b9c683db60d0806793dfbe0f609bfc4840b3119"
+                "reference": "ffdac96fb4c631a433eb24207c3e48cfb09bcc1a"
             },
             "require": {
                 "laravel/framework": "^12.0 || ^13.0",

@@ -30,7 +30,7 @@
         "php": "^8.4",
         "laravel/framework": "^12.0 || ^13.0",
         "laravel/nova": "^5.0",
-        "wobqqq/nova-aegis": "^1.1 || dev-main"
+        "wobqqq/nova-aegis": "^1.1 || ^2.0 || dev-main"
     },
     "require-dev": {
         "driftingly/rector-laravel": "^2.0",
