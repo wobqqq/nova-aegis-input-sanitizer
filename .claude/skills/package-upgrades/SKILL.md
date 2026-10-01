@@ -41,7 +41,7 @@ The section is one `aegis_settings` row, key `input-sanitizer`, saved through th
 
 ## The core's contract
 
-The module uses `Aegis::module()`, `::check()`, `::settings()`, `Contracts\Module` and `Check`, `CheckResult`, `Field`, `Events\SettingsSaved`, plus `SettingsRepository::save()` (the console command) and the `aegis.cache_store` config key.
+The module uses `Aegis::module()`, `::check()`, `::settings()`, `Contracts\Module` and `Check`, `CheckResult`, `Field`, `Events\SettingsSaved`, `Aegis::save()` (the console command) and `Support\Values` (core `^1.1`), plus the `aegis.cache_store` config key.
 
 - Use only these. A newer core API is used behind a check (`method_exists`, `class_exists`) with a fallback.
 - The model events are listened to by name (`eloquent.saved: Wobqqq\Aegis\Settings\AegisSetting`): a renamed class only silences that listener, `SettingsSaved` still clears the cache.

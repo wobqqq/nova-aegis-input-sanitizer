@@ -21,7 +21,7 @@ use Wobqqq\AegisInputSanitizer\Settings\SettingsStore;
 
 final class InputSanitizerServiceProvider extends ServiceProvider
 {
-    /** Saved by hand or by an older core that dispatches no SettingsSaved. */
+    /** A row written without Aegis::save() dispatches no SettingsSaved; listened to by name, so a renamed model only silences it. */
     private const SETTING_MODEL_EVENTS = [
         'eloquent.saved: Wobqqq\Aegis\Settings\AegisSetting',
         'eloquent.deleted: Wobqqq\Aegis\Settings\AegisSetting',

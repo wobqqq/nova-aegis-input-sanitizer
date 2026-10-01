@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Wobqqq\Aegis\Settings\SettingsRepository;
+use Wobqqq\Aegis\Aegis;
 use Wobqqq\AegisInputSanitizer\InputSanitizerModule;
 use Wobqqq\AegisInputSanitizer\Tests\Fixtures\User;
 use Wobqqq\AegisInputSanitizer\Tests\TestCase;
@@ -28,7 +28,7 @@ function editor(): User
  */
 function sanitize(array $values = []): array
 {
-    return resolve(SettingsRepository::class)->save(
+    return Aegis::save(
         InputSanitizerModule::KEY,
         array_replace((new InputSanitizerModule())->defaults(), ['enabled' => true], $values),
     );

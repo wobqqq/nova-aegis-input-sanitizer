@@ -49,8 +49,8 @@ Installing Nova needs a license: `auth.json` (gitignored and export-ignored) hol
 
 The core is a separate package that applications update on their own schedule; a module must keep working with every released core of the same major.
 
-- Use only the core's public contract (listed in the core's AGENTS.md): `Aegis::module()`, `Aegis::check()`, `Aegis::settings('input-sanitizer')`, `Contracts\Module`, `Contracts\Check`, `CheckResult`, `Field`, `Events\SettingsSaved`. The exceptions are deliberate and small: `SettingsRepository::save()` in the console command (the only way to persist a section), and the `aegis.cache_store` config key with a fallback to the default store.
-- Settings are read only through `Aegis::settings()` and written only through the core (the Aegis page or `SettingsRepository::save()`), never through the table (an arch test enforces it).
+- Use only the core's public contract (listed in the core's AGENTS.md): `Aegis::module()`, `Aegis::check()`, `Aegis::settings('input-sanitizer')`, `Aegis::save()`, `Support\Values`, `Contracts\Module`, `Contracts\Check`, `CheckResult`, `Field`, `Events\SettingsSaved`. The only other dependency is the `aegis.cache_store` config key, with a fallback to the default store. The module requires core `^1.1`, the first release with `Aegis::save()` and `Values` as public API.
+- Settings are read only through `Aegis::settings()` and written only through the core (the Aegis page or `Aegis::save()`), never through the table (an arch test enforces it).
 - The cache is cleared on `SettingsSaved` for this section and on the settings model's `eloquent.saved` / `eloquent.deleted` events, listened to by name: a row may be written without the core's event.
 - A newer core API is used only behind a check (`method_exists`, `class_exists`) with a fallback.
 

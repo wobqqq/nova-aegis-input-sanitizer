@@ -37,6 +37,12 @@ arch('the module opens no network connection')
     ->expect('Wobqqq\AegisInputSanitizer')
     ->not->toUse(['stream_socket_client', 'fsockopen', 'curl_init', 'file_get_contents', Illuminate\Support\Facades\Http::class]);
 
-arch('settings are read through the Aegis contract, never the table')
+arch('settings are read and saved through the Aegis contract, never the table')
     ->expect('Wobqqq\AegisInputSanitizer')
-    ->not->toUse([Wobqqq\Aegis\Settings\AegisSetting::class, Illuminate\Support\Facades\DB::class]);
+    ->not->toUse([
+        Wobqqq\Aegis\Settings\AegisSetting::class,
+        Wobqqq\Aegis\Settings\SettingsRepository::class,
+        Wobqqq\Aegis\Modules\ModuleRegistry::class,
+        Wobqqq\Aegis\Checks\CheckRegistry::class,
+        Illuminate\Support\Facades\DB::class,
+    ]);

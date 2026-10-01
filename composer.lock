@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "08c0f83f606825713cc5ca743ede1424",
+    "content-hash": "bcaccf3bbe761575dfe7826fdc4865fb",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -8071,7 +8071,7 @@
             "dist": {
                 "type": "path",
                 "url": "../nova-aegis",
-                "reference": "5f9fcc0695f75bb93e0f2a03effb281d9a736bde"
+                "reference": "ff67b95b39486b5cfec9c3ea31b789e18f8a13c7"
             },
             "require": {
                 "laravel/framework": "^12.0",

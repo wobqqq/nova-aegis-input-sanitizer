@@ -134,7 +134,7 @@ it('ignores the saves of other sections', function (): void {
     sanitize(['block_threshold' => 3]);
     expect(store()->settings()->blockThreshold)->toBe(3);
 
-    resolve(SettingsRepository::class)->save('hardening', resolve(ModuleRegistry::class)->getOrFail('hardening')->defaults());
+    Aegis::save('hardening', resolve(ModuleRegistry::class)->getOrFail('hardening')->defaults());
 
     expect(Cache::get(SettingsStore::CACHE_KEY))->toBeArray()->toHaveKey('block_threshold', 3);
 });

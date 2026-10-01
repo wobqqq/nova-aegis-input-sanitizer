@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Wobqqq\AegisInputSanitizer\Settings;
 
+use Wobqqq\Aegis\Support\Values;
 use Wobqqq\AegisInputSanitizer\Enums\Category;
 use Wobqqq\AegisInputSanitizer\Scanning\PatternMatcher;
 
@@ -45,18 +46,18 @@ final readonly class InputSanitizerSettings
     /**
      * Reads the stored values again, whatever they are: the row may predate the rules or be written by hand.
      *
-     * @param array<mixed> $values
+     * @param array<string, mixed> $values
      */
     public static function fromArray(array $values): self
     {
-        $view = self::string($values, 'view');
+        $view = Values::string($values, 'view');
         $threshold = $values['block_threshold'] ?? null;
         $threshold = is_int($threshold) || (is_string($threshold) && ctype_digit($threshold)) ? (int)$threshold : 0;
 
         $patterns = [];
 
         foreach (Category::cases() as $category) {
-            $pattern = self::string($values, $category->setting());
+            $pattern = Values::string($values, $category->setting());
 
             if (PatternMatcher::compiles($pattern)) {
                 $patterns[$category->value] = $pattern;
@@ -66,10 +67,10 @@ final readonly class InputSanitizerSettings
         $headers = array_fill_keys(self::ALWAYS_EXCLUDED_HEADERS, true) + self::names($values, 'excluded_headers', self::HEADER_NAME);
 
         return new self(
-            self::bool($values, 'enabled'),
-            self::bool($values, 'scan_json'),
-            self::bool($values, 'scan_nova'),
-            self::bool($values, 'log_blocked', true),
+            Values::bool($values, 'enabled'),
+            Values::bool($values, 'scan_json'),
+            Values::bool($values, 'scan_nova'),
+            Values::bool($values, 'log_blocked', true),
             $threshold >= 1 && $threshold <= self::MAX_THRESHOLD ? $threshold : self::DEFAULT_THRESHOLD,
             PatternMatcher::matches(self::VIEW_NAME, $view) && strlen($view) <= 150 ? $view : self::DEFAULT_VIEW,
             $patterns,
@@ -119,39 +120,18 @@ final readonly class InputSanitizerSettings
     }
 
     /**
-     * @param array<mixed> $values
-     */
-    private static function bool(array $values, string $key, bool $default = false): bool
-    {
-        $value = $values[$key] ?? $default;
-
-        return is_bool($value) ? $value : filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? $default;
-    }
-
-    /**
-     * @param array<mixed> $values
-     */
-    private static function string(array $values, string $key): string
-    {
-        $value = $values[$key] ?? null;
-
-        return is_string($value) ? trim($value) : '';
-    }
-
-    /**
-     * @param array<mixed> $values
+     * @param array<string, mixed> $values
      *
      * @return array<string, true>
      */
     private static function names(array $values, string $key, string $format): array
     {
-        $rows = $values[$key] ?? [];
         $names = [];
 
-        foreach (is_array($rows) ? $rows : [] as $row) {
-            $name = is_array($row) && is_string($row['name'] ?? null) ? strtolower(trim($row['name'])) : '';
+        foreach (Values::column($values, $key, 'name') as $name) {
+            $name = strtolower($name);
 
-            if ($name !== '' && strlen($name) <= 100 && PatternMatcher::matches($format, $name)) {
+            if (strlen($name) <= 100 && PatternMatcher::matches($format, $name)) {
                 $names[$name] = true;
             }
         }
