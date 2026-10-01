@@ -96,7 +96,8 @@ Pest 4 on Orchestra Testbench 10 with the real `laravel/nova` and the real Aegis
   2. commit on the branch and `git push -u origin <branch>`;
   3. open a pull request with the template filled in (what changes, what it means for applications that upgrade);
   4. merge once `make ready` passed, then delete the branch.
-- A release is a tag pushed on a merged commit of `main` (`git tag -a v1.0.0 -m "..." && git push origin v1.0.0`); Packagist reads the tag.
+- GitHub Actions run `composer code.check` and `composer test.coverage` on every pull request, with the core checked out next to the module (`nova-aegis`, branch `main`) for the path repository. They need the `NOVA_USERNAME` and `NOVA_LICENSE_KEY` secrets, and `AEGIS_CORE_TOKEN` (read access to `wobqqq/nova-aegis`) while the core is private.
+- A release is a tag pushed on a merged commit of `main` (`git tag -a v1.0.0 -m "..." && git push origin v1.0.0`) with its section in `CHANGELOG.md`; the release workflow runs CI and publishes the GitHub release, Packagist reads the tag.
 - Code, comments, commit messages, pull requests, issues and documentation are written in **English**.
 
 ## Conventions
