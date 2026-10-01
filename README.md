@@ -29,16 +29,33 @@
 
 ## 📥 Installation
 
+### 1. Install the package
+
 ```bash
 composer require wobqqq/nova-aegis-input-sanitizer
+```
+
+The service provider is discovered automatically.
+
+### 2. Run the migrations
+
+```bash
 php artisan migrate
 ```
 
-The service provider is discovered automatically; `php artisan migrate` creates the Aegis settings table if the core is new to the application. The module adds no table of its own.
+This creates the Aegis settings table if the core is new to the application; the module adds no table of its own.
 
-Then open **Aegis → Settings** in Nova, review the **Input Sanitizer** section and switch on **Scan the requests**. Nothing is blocked until you do.
+### 3. Set up Aegis (once per application)
 
-To change the built-in page for a blocked request, publish it, or name any view of your own in the settings:
+If Aegis is new to the application, register its tool and define the `viewAegis` gate as the [Aegis README](https://github.com/wobqqq/nova-aegis#-installation) describes. Skip this step if you already use another Aegis module.
+
+### 4. Turn it on in Nova
+
+Open **Aegis → Settings → Input Sanitizer** in Nova, review the patterns and the excluded inputs, switch **Scan the requests** on and save. Nothing is blocked until you do.
+
+### 5. Customise the blocked-request page (optional)
+
+Publish the built-in page, or name any view of your own in the settings:
 
 ```bash
 php artisan vendor:publish --tag=aegis-input-sanitizer-views
