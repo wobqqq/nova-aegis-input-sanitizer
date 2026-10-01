@@ -14,7 +14,7 @@ use Wobqqq\AegisInputSanitizer\Settings\InputSanitizerSettings;
  */
 final readonly class RequestScanner
 {
-    private const DECODE_ROUNDS = 3;
+    private const int DECODE_ROUNDS = 3;
 
     public function scan(Request $request, InputSanitizerSettings $settings): ScanResult
     {
@@ -24,7 +24,7 @@ final readonly class RequestScanner
             return new ScanResult(false, []);
         }
 
-        foreach ($this->values($request, $settings) as [$source, $value]) {
+        foreach ($this->values($this->inputs($request, $settings), $request, $settings) as [$source, $value]) {
             $decoded = str_replace(["\r", "\n"], '', $this->decode($value));
 
             foreach ($settings->patterns as $category => $pattern) {
@@ -44,19 +44,33 @@ final readonly class RequestScanner
     }
 
     /**
-     * @return Generator<int, array{0: string, 1: string}>
+     * @return array<string, array<mixed>>
      */
-    private function values(Request $request, InputSanitizerSettings $settings): Generator
+    private function inputs(Request $request, InputSanitizerSettings $settings): array
     {
-        yield from $this->input($request->query->all(), 'query', '', $settings->excludedInputs);
+        $inputs = ['query' => $request->query->all()];
 
         if ($request->isJson()) {
             if ($settings->scanJson) {
-                yield from $this->input($request->json()->all(), 'json', '', $settings->excludedInputs);
+                $inputs['json'] = $request->json()->all();
             }
         } elseif ($request->request !== $request->query) {
             // On GET Laravel points the request bag at the query, which is already scanned.
-            yield from $this->input($request->request->all(), 'body', '', $settings->excludedInputs);
+            $inputs['body'] = $request->request->all();
+        }
+
+        return $inputs;
+    }
+
+    /**
+     * @param array<string, array<mixed>> $inputs
+     *
+     * @return Generator<int, array{0: string, 1: string}>
+     */
+    private function values(array $inputs, Request $request, InputSanitizerSettings $settings): Generator
+    {
+        foreach ($inputs as $source => $data) {
+            yield from $this->input($data, $source, '', $settings->excludedInputs);
         }
 
         foreach ($request->headers->all() as $name => $values) {

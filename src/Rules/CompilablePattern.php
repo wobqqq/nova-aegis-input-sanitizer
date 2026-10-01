@@ -6,6 +6,7 @@ namespace Wobqqq\AegisInputSanitizer\Rules;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Override;
 use Wobqqq\AegisInputSanitizer\Scanning\PatternMatcher;
 
 /**
@@ -13,6 +14,7 @@ use Wobqqq\AegisInputSanitizer\Scanning\PatternMatcher;
  */
 final class CompilablePattern implements ValidationRule
 {
+    #[Override]
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (!is_string($value) || !PatternMatcher::compiles(trim($value))) {

@@ -18,9 +18,9 @@ final class SettingsStore
     /**
      * Versioned: a release that changes what is cached bumps it.
      */
-    public const CACHE_KEY = 'aegis.input-sanitizer.settings.v1';
+    public const string CACHE_KEY = 'aegis.input-sanitizer.settings.v1';
 
-    private const TTL = 3600;
+    private const int TTL = 3600;
 
     private ?InputSanitizerSettings $settings = null;
 
@@ -49,8 +49,8 @@ final class SettingsStore
 
         try {
             $this->cache->forget(self::CACHE_KEY);
-        } catch (Throwable $e) {
-            report($e);
+        } catch (Throwable $throwable) {
+            report($throwable);
         }
     }
 

@@ -7,9 +7,11 @@ namespace Wobqqq\AegisInputSanitizer\Rules;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\View\Factory as ViewFactory;
+use Override;
 
 final class ExistingView implements ValidationRule
 {
+    #[Override]
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (!is_string($value) || !resolve(ViewFactory::class)->exists($value)) {

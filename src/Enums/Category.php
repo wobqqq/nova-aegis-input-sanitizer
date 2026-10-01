@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Wobqqq\AegisInputSanitizer\Enums;
 
+use Wobqqq\AegisInputSanitizer\Support\Message;
+
 enum Category: string
 {
     case XSS = 'xss';
@@ -21,7 +23,7 @@ enum Category: string
 
     public function label(): string
     {
-        return (string)__('aegis-input-sanitizer::input-sanitizer.categories.' . $this->value);
+        return Message::get('aegis-input-sanitizer::input-sanitizer.categories.' . $this->value);
     }
 
     public function defaultPattern(): string

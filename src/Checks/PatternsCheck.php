@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Wobqqq\AegisInputSanitizer\Checks;
 
 use Illuminate\Contracts\View\Factory as ViewFactory;
+use Override;
 use Wobqqq\Aegis\Aegis;
 use Wobqqq\Aegis\Checks\CheckResult;
 use Wobqqq\Aegis\Contracts\Check;
@@ -12,18 +13,20 @@ use Wobqqq\AegisInputSanitizer\Enums\Category;
 use Wobqqq\AegisInputSanitizer\InputSanitizerModule;
 use Wobqqq\AegisInputSanitizer\Scanning\PatternMatcher;
 use Wobqqq\AegisInputSanitizer\Settings\InputSanitizerSettings;
+use Wobqqq\AegisInputSanitizer\Support\Message;
 
 /**
  * Reports what the sanitizer silently skips: a saved pattern that no longer compiles, a page that no longer exists.
  */
 final readonly class PatternsCheck implements Check
 {
-    private const KEY = 'input-sanitizer-patterns';
+    private const string KEY = 'input-sanitizer-patterns';
 
     public function __construct(private ViewFactory $views)
     {
     }
 
+    #[Override]
     public function run(): CheckResult
     {
         $values = Aegis::settings(InputSanitizerModule::KEY);
@@ -60,6 +63,6 @@ final readonly class PatternsCheck implements Check
      */
     private function trans(string $key, array $replace = []): string
     {
-        return (string)__('aegis-input-sanitizer::input-sanitizer.' . $key, $replace);
+        return Message::get('aegis-input-sanitizer::input-sanitizer.' . $key, $replace);
     }
 }

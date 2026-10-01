@@ -23,13 +23,13 @@ final class DisableCommand extends Command
 
         try {
             Aegis::save(InputSanitizerModule::KEY, $values);
-        } catch (ValidationException $e) {
+        } catch (ValidationException $validationException) {
             // A row the rules refuse must not keep the sanitizer on: its invalid values go back to their defaults.
             $invalid = array_values(array_unique(array_map(
                 static fn (string $attribute): string => explode('.', $attribute)[0],
-                array_keys($e->errors()),
+                array_keys($validationException->errors()),
             )));
-            $defaults = array_intersect_key((new InputSanitizerModule())->defaults(), array_flip($invalid));
+            $defaults = array_intersect_key(new InputSanitizerModule()->defaults(), array_flip($invalid));
 
             Aegis::save(InputSanitizerModule::KEY, array_replace($values, $defaults, ['enabled' => false]));
 

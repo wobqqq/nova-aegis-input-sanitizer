@@ -9,9 +9,11 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
+use Inertia\ServiceProvider;
 use Laravel\Nova\Nova;
 use Laravel\Nova\NovaCoreServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
+use Override;
 use Wobqqq\Aegis\AegisServiceProvider;
 use Wobqqq\Aegis\Nova\AegisTool;
 use Wobqqq\AegisInputSanitizer\InputSanitizerServiceProvider;
@@ -19,6 +21,7 @@ use Wobqqq\AegisInputSanitizer\Tests\Fixtures\User;
 
 abstract class TestCase extends BaseTestCase
 {
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -42,11 +45,13 @@ abstract class TestCase extends BaseTestCase
     /**
      * @return list<class-string>
      */
+    #[Override]
     protected function getPackageProviders($app): array
     {
-        return [\Inertia\ServiceProvider::class, NovaCoreServiceProvider::class, AegisServiceProvider::class, InputSanitizerServiceProvider::class];
+        return [ServiceProvider::class, NovaCoreServiceProvider::class, AegisServiceProvider::class, InputSanitizerServiceProvider::class];
     }
 
+    #[Override]
     protected function defineEnvironment($app): void
     {
         $app['config']->set('auth.providers.users.model', User::class);
@@ -55,6 +60,7 @@ abstract class TestCase extends BaseTestCase
         $app['view']->addLocation(__DIR__ . '/Fixtures/views');
     }
 
+    #[Override]
     protected function defineRoutes($router): void
     {
         $echo = static fn (Request $request): JsonResponse => new JsonResponse(['ok' => true, 'input' => $request->all()]);
@@ -65,6 +71,7 @@ abstract class TestCase extends BaseTestCase
         $router->any('/admin/resources/posts', static fn (): string => 'admin');
     }
 
+    #[Override]
     protected function defineDatabaseMigrations(): void
     {
         $this->loadMigrationsFrom(__DIR__ . '/../vendor/wobqqq/nova-aegis/database/migrations');
