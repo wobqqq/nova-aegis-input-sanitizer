@@ -4,7 +4,7 @@
 
 ## Skills and hooks
 
-- Skills in `.claude/skills/`: `aegis-security` (read it for any change to what a request can do or what gets through), `package-upgrades` (anything that reaches an installed application), `package-testing`, `nova-development`, `testing-best-practices`, `laravel-best-practices`.
+- Skills in `.claude/skills/`: the architecture skills (`application-layer`, `dependency-injection`, `error-handling`, `validation`, `events`, `testing-architecture`, `domain-layer-cqrs`, `package-boundaries`; see *Architecture* in AGENTS.md), `aegis-security` (read it for any change to what a request can do or what gets through), `package-upgrades` (anything that reaches an installed application), `package-testing`, `nova-development`, `testing-best-practices`, `laravel-best-practices`.
 - A changed PHP file is formatted by the `PostToolUse` hook in `.claude/settings.json`; still run `make ready` before you say a change is done, and report its result.
 - The core lives in the sibling repository `../nova-aegis` and is installed from it through the `path` repository. Never change it from here: a change to the core is a pull request on the core.
 - `laravel/nova` is the test double in `stubs/nova`, a verbatim copy of the core's: a new Nova API is added in the core first, with the real signature (see `package-testing`), then copied here.

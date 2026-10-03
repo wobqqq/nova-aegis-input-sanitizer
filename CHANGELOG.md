@@ -4,6 +4,10 @@ All notable changes are documented here. The format follows [Keep a Changelog](h
 
 ## [Unreleased]
 
+### Changed
+
+- Internal refactoring along the architecture skills, no change for applications: the scanner reads a `Submission` the middleware builds instead of the request, and the disable command calls `DisableInputSanitizer`.
+
 ## [1.1.0] - 2026-10-01
 
 ### Added
