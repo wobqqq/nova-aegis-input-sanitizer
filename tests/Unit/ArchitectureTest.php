@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Wobqqq\Aegis\Checks\CheckRegistry;
@@ -56,3 +57,7 @@ arch('settings are read and saved through the Aegis contract, never the table')
         CheckRegistry::class,
         DB::class,
     ]);
+
+arch('the scanner reads a submission, never the request')
+    ->expect('Wobqqq\AegisInputSanitizer\Scanning')
+    ->not->toUse(Request::class);

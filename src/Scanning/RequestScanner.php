@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Wobqqq\AegisInputSanitizer\Scanning;
 
 use Generator;
-use Illuminate\Http\Request;
 use Wobqqq\AegisInputSanitizer\Enums\Category;
 use Wobqqq\AegisInputSanitizer\Settings\InputSanitizerSettings;
 
@@ -16,7 +15,7 @@ final readonly class RequestScanner
 {
     private const int DECODE_ROUNDS = 3;
 
-    public function scan(Request $request, InputSanitizerSettings $settings): ScanResult
+    public function scan(Submission $submission, InputSanitizerSettings $settings): ScanResult
     {
         $detections = [];
 
@@ -24,7 +23,7 @@ final readonly class RequestScanner
             return new ScanResult(false, []);
         }
 
-        foreach ($this->values($this->inputs($request, $settings), $request, $settings) as [$source, $value]) {
+        foreach ($this->values($submission, $settings) as [$source, $value]) {
             $decoded = str_replace(["\r", "\n"], '', $this->decode($value));
 
             foreach ($settings->patterns as $category => $pattern) {
@@ -44,36 +43,15 @@ final readonly class RequestScanner
     }
 
     /**
-     * @return array<string, array<mixed>>
-     */
-    private function inputs(Request $request, InputSanitizerSettings $settings): array
-    {
-        $inputs = ['query' => $request->query->all()];
-
-        if ($request->isJson()) {
-            if ($settings->scanJson) {
-                $inputs['json'] = $request->json()->all();
-            }
-        } elseif ($request->request !== $request->query) {
-            // On GET Laravel points the request bag at the query, which is already scanned.
-            $inputs['body'] = $request->request->all();
-        }
-
-        return $inputs;
-    }
-
-    /**
-     * @param array<string, array<mixed>> $inputs
-     *
      * @return Generator<int, array{0: string, 1: string}>
      */
-    private function values(array $inputs, Request $request, InputSanitizerSettings $settings): Generator
+    private function values(Submission $submission, InputSanitizerSettings $settings): Generator
     {
-        foreach ($inputs as $source => $data) {
+        foreach ($submission->inputs as $source => $data) {
             yield from $this->input($data, $source, '', $settings->excludedInputs);
         }
 
-        foreach ($request->headers->all() as $name => $values) {
+        foreach ($submission->headers as $name => $values) {
             $name = strtolower($name);
 
             if (isset($settings->excludedHeaders[$name])) {
@@ -87,8 +65,8 @@ final readonly class RequestScanner
             }
         }
 
-        foreach ($request->segments() as $index => $segment) {
-            if (is_string($segment) && $segment !== '') {
+        foreach ($submission->segments as $index => $segment) {
+            if ($segment !== '') {
                 yield ['path.' . $index, $segment];
             }
         }

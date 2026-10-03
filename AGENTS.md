@@ -38,11 +38,12 @@ No Nova license is needed: `laravel/nova` resolves to the test double in `stubs/
 | `src/Settings/InputSanitizerSettings.php` | The typed settings, read again from any stored row with safe fallbacks; only the patterns that compile. |
 | `src/Settings/SettingsStore.php` | The cached settings every request reads (`aegis.input-sanitizer.settings.v1`), scoped per request. |
 | `src/Scanning/PatternMatcher.php` | The only place a pattern runs. A pattern that does not compile or gives up is no match, never an error. |
-| `src/Scanning/RequestScanner.php` | What is scanned, the decoding, the score across the whole request, the exclusions. |
-| `src/Http/Middleware/SanitizeInput.php` | Runs the scan on every request (Nova and the Aegis API skipped), refuses with 400, logs without values, fails open. |
+| `src/Scanning/RequestScanner.php` | The decoding, the score across the whole submission, the exclusions; it never sees the request. |
+| `src/Scanning/Submission.php` | The parts of a request that are scanned (inputs by source, headers, path segments), taken by the middleware. |
+| `src/Http/Middleware/SanitizeInput.php` | Decides what is scanned (Nova and the Aegis API skipped, JSON when enabled), builds the `Submission`, refuses with 400, logs without values, fails open. |
 | `src/Rules/` | `CompilablePattern` and `ExistingView`, the save-time validation. |
 | `src/Checks/PatternsCheck.php` | Warns about a saved pattern that is skipped or a page that is gone. |
-| `src/Console/DisableCommand.php` | `aegis:input-sanitizer:disable`, the recovery path. |
+| `src/Console/DisableCommand.php` | `aegis:input-sanitizer:disable`, the recovery path: it calls `Actions\DisableInputSanitizer` and reports what was reset. |
 | `resources/views/blocked.blade.php` | The built-in page for a blocked request. |
 | `resources/lang/en/input-sanitizer.php` | Every label and message, under `aegis-input-sanitizer::input-sanitizer.*`. |
 | `stubs/nova/` | The Nova test double the suite and PHPStan run on, a copy of the core's (export-ignored). |
@@ -55,6 +56,20 @@ The core is a separate package that applications update on their own schedule; a
 - Settings are read only through `Aegis::settings()` and written only through the core (the Aegis page or `Aegis::save()`), never through the table (an arch test enforces it).
 - The cache is cleared on `SettingsSaved` for this section and on the settings model's `eloquent.saved` / `eloquent.deleted` events, listened to by name: a row may be written without the core's event.
 - A newer core API is used only behind a check (`method_exists`, `class_exists`) with a fallback.
+
+## Architecture
+
+The architecture skills in `.claude/skills/` are the rules for how code is shaped; read the one that matches the change before writing it:
+
+- `application-layer`: entry points (middleware, controllers, console commands, the module's Nova pieces) only translate input and output; the work sits in classes named after what they do, with typed input.
+- `dependency-injection`: collaborators and configuration arrive through the constructor; facades stay in entry points; interfaces only at I/O boundaries (HTTP, sockets, the clock, processes).
+- `error-handling`, `validation`: failures are typed exceptions, never `null` or `false`; input shape is validated at the entry point, business rules where the work is done.
+- `events`: reactions run after the commit, from events that say what happened.
+- `testing-architecture`: unit tests for pure logic, feature tests for use cases, fakes only at boundaries.
+- `domain-layer-cqrs`: when (rarely) a separate domain layer or read side pays off.
+- `package-boundaries`: what is public API here and how it may change.
+
+In this module: the middleware is the only code that reads the request; it builds a `Submission` and `RequestScanner` scores it (an architecture test keeps `Scanning` free of `Request`); the disable command calls `Actions\DisableInputSanitizer`.
 
 ## Upgrading installed applications safely
 
