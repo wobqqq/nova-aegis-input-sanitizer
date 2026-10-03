@@ -15,6 +15,7 @@ use Throwable;
 use Wobqqq\AegisInputSanitizer\Scanning\Detection;
 use Wobqqq\AegisInputSanitizer\Scanning\RequestScanner;
 use Wobqqq\AegisInputSanitizer\Scanning\ScanResult;
+use Wobqqq\AegisInputSanitizer\Scanning\Submission;
 use Wobqqq\AegisInputSanitizer\Settings\InputSanitizerSettings;
 use Wobqqq\AegisInputSanitizer\Settings\SettingsStore;
 use Wobqqq\AegisInputSanitizer\Support\Message;
@@ -39,7 +40,7 @@ final readonly class SanitizeInput
     {
         try {
             $settings = $this->store->settings();
-            $result = $settings->enabled && $this->scans($request, $settings) ? $this->scanner->scan($request, $settings) : null;
+            $result = $settings->enabled && $this->scans($request, $settings) ? $this->scanner->scan($this->submission($request, $settings), $settings) : null;
         } catch (Throwable $throwable) {
             report($throwable);
 
@@ -55,6 +56,28 @@ final readonly class SanitizeInput
         }
 
         return $this->refuse($request, $settings);
+    }
+
+    private function submission(Request $request, InputSanitizerSettings $settings): Submission
+    {
+        $inputs = ['query' => $request->query->all()];
+
+        if ($request->isJson()) {
+            if ($settings->scanJson) {
+                $inputs['json'] = $request->json()->all();
+            }
+        } elseif ($request->request !== $request->query) {
+            // On GET Laravel points the request bag at the query, which is already scanned.
+            $inputs['body'] = $request->request->all();
+        }
+
+        $headers = [];
+
+        foreach ($request->headers->all() as $name => $values) {
+            $headers[strtolower((string)$name)] = array_values($values);
+        }
+
+        return new Submission($inputs, $headers, array_values(array_filter($request->segments(), is_string(...))));
     }
 
     private function scans(Request $request, InputSanitizerSettings $settings): bool
